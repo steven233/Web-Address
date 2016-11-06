@@ -1,0 +1,13 @@
+#!/bin/bash
+
+USERNAME=username
+PASSWORD=password
+#logs on to the site and saves the related session cookie
+curl -d "username=$USERNAME&password=$PASSWORD&login=Log In" --cookie-jar /tmp/cookie https://www.iblocklist.com/functions/login.php
+#get the lists
+curl -sL --cookie /tmp/cookie https://www.iblocklist.com/lists.php \
+  | sed -n "s/.*value='\(http:.*p2p.*\)'.*/\1/p" \
+  | xargs wget -O - \
+  | gunzip \
+  | egrep -v '^#' \
+  >~/blocklist.dat
